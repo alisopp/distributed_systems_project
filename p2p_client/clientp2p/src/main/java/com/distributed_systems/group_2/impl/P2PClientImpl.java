@@ -56,6 +56,22 @@ public class P2PClientImpl implements P2PClient {
     }
 
     @Override
+    public void onCommunicationLost(OtherClient otherClient) {
+        //TODO lost communication with chat partner
+    }
+
+    @Override
+    public void onCommunicationEstablishedFailed(OtherClient otherClient) {
+        //TODO failed to connect to chatPartner
+    }
+
+    @Override
+    public void startCommunication(String clientName) throws IOException {
+        OtherClient otherClient = connectionToSuperServer.getOtherClientFromServer(clientName);
+        connectTo(otherClient);
+    }
+
+    @Override
     public void sendMessage(int localCommunicationPartnerIndex, String message) {
         connectionPartners.get(localCommunicationPartnerIndex).sendMessage(message);
     }

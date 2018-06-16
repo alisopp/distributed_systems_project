@@ -2,3 +2,5 @@ p2p_client/build
 p2p_client/bin
 p2p_client/.idea
 *iml
+gradlew
+gradlew.bat

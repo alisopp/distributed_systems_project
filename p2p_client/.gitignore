@@ -1,0 +1,8 @@
+build
+bin
+/.idea
+*iml
+gradlew
+gradlew.bat
+out
+clientp2p/.gradle

@@ -11,8 +11,8 @@
    <children>
       <Label text="ServerIp" />
       <Label text="ServerPort" GridPane.rowIndex="1" />
-      <TextField promptText="127.0.0.7" GridPane.columnIndex="1" />
-      <TextField promptText="port" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <TextField fx:id="ip" promptText="127.0.0.7" GridPane.columnIndex="1" />
+      <TextField fx:id="port" promptText="port" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <Button mnemonicParsing="false" onAction="#updateStage" text="Connect" GridPane.columnIndex="1" GridPane.rowIndex="2" />
    </children>
    <rowConstraints>

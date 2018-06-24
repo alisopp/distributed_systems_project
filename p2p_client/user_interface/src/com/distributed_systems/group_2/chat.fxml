@@ -16,6 +16,6 @@
     </rowConstraints>
     <children>
         <ListView prefHeight="87.0" prefWidth="113.0" />
-        <TextArea prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
+        <TextArea fx:id="chatText" onKeyPressed="#keyDownChat" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
     </children>
 </GridPane>

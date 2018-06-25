@@ -46,7 +46,8 @@ public class P2PClientImpl implements P2PClient {
 
     @Override
     public void register(String hostURL) throws IOException {
-        connectionToSuperServer = new ServerConnectorImpl(hostURL, userName);
+        connectionToSuperServer = new ServerConnectorImpl(hostURL, userName, messageHandler);
+        connectionToSuperServer.initServerConnection(444);
         startUDP();
     }
 

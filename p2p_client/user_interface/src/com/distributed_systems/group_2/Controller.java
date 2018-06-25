@@ -1,5 +1,9 @@
 package com.distributed_systems.group_2;
 
+import com.distributed_systems.group_2.impl.P2PClientImpl;
+import com.distributed_systems.group_2.interfaces.MessageHandler;
+import com.distributed_systems.group_2.interfaces.OtherClient;
+import com.distributed_systems.group_2.interfaces.P2PClient;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,30 +14,31 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+import java.io.IOException;
 
-public class Controller {
+
+public class Controller implements MessageHandler {
+
+    private static P2PClient client;
+
     @FXML private TextField ip;
     @FXML private TextField port;
     @FXML private TextArea chatText;
     @FXML private TableView<User> clientTable;
     @FXML private ListView chatHistory;
+    @FXML private TextField connect;
+
+
     @FXML
     public void updateStage() throws Exception{
+
         String masterIp=ip.getText();
         String masterPort=port.getText();
-        //TODO connect to Master Server
-        Parent root = FXMLLoader.load(getClass().getResource("connectToClient.fxml"));
-        Main.primaryStage.getScene().setRoot(root);
-    }
-    @FXML
-    public void connectTo() throws Exception{
-        if (clientTable.getSelectionModel().getSelectedItem()==null){
-            return;
-        }
-        User user=clientTable.getSelectionModel().getSelectedItem();
-        //TODO connect to user
-        Parent root = FXMLLoader.load(getClass().getResource("chat.fxml"));
-        Main.primaryStage.getScene().setRoot(root);
+        client = new P2PClientImpl(7777,40000, "Hellmuth");
+        client.setMessageHandler(this);
+        client.register(masterIp+":"+masterPort);
+        //TODO check if connection established
+
     }
     @FXML
     public void keyDownChat(KeyEvent event) throws Exception{
@@ -44,17 +49,40 @@ public class Controller {
     }
     @FXML
     public void refreshClients() throws Exception{
-        if (clientTable==null) {
-            return;
-        }
-        clientTable.getItems().clear();
-        //TODO get Users from master Server and add them
-
-        addUser("user","0.1.2.3");
+        client.startCommunication(connect.getText());
+        Parent root = FXMLLoader.load(getClass().getResource("chat.fxml"));
+        Main.primaryStage.getScene().setRoot(root);
     }
 
-    public void addUser(String name, String ip){
-        if (clientTable!=null)
-        clientTable.getItems().add(new User(name,ip));
+
+    @Override
+    public void onReceivedMessage(OtherClient client, String content) {
+
+    }
+
+    @Override
+    public void onLostCommunication(OtherClient client) {
+
+    }
+
+    @Override
+    public void onCommunicationEstablished(OtherClient client) {
+
+    }
+
+    @Override
+    public void onFailedToEstablishedACommunication(OtherClient client) {
+
+    }
+
+    @Override
+    public void onRegisteredAtServer(boolean connectionSuccessful) {
+        Parent root = null;
+        try {
+            root = FXMLLoader.load(getClass().getResource("connectToClient.fxml"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Main.primaryStage.getScene().setRoot(root);
     }
 }

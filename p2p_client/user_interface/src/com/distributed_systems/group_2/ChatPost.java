@@ -24,4 +24,8 @@ public class ChatPost {
     public void setText(String text) {
         this.text.set(text);
     }
+
+    @Override
+    public String toString() {
+        return text.get();   }
 }

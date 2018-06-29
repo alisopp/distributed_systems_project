@@ -10,8 +10,8 @@ public interface P2PClient {
     void startUDP() throws IOException;
     void register(String hostURL)  throws IOException;
     void onReceivedMessage(OtherClient client, String message);
-    void onCommunicationLost(OtherClient otherClient);
-    void onCommunicationEstablishedFailed(OtherClient otherClient);
+    void onCommunicationLost(OtherClient otherClient) throws IOException;
+    void onCommunicationEstablishedFailed(OtherClient otherClient) throws IOException;
 
     /**
      * starts a communication with another client by getting his address from the server
@@ -23,6 +23,6 @@ public interface P2PClient {
     void connectionEstablished(ClientConnection clientConnection);
     void connectTo(OtherClient otherClient) throws IOException;
     void setMessageHandler(MessageHandler messageHandler);
-    void shutdown();
+    void shutdown() throws IOException, InterruptedException;
     Map<Integer,ClientConnection> getCommunicationPartners();
 }

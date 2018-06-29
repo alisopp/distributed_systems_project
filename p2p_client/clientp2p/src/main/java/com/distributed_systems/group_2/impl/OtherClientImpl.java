@@ -10,6 +10,7 @@ public class OtherClientImpl implements OtherClient {
     private int port;
     private InetAddress socketAddress;
     private int localCommunicationPartnerIndex;
+    private boolean hasServerSocket = false;
 
     public OtherClientImpl(String userName, int port, InetAddress socketAddress) {
         this.userName = userName;
@@ -40,5 +41,15 @@ public class OtherClientImpl implements OtherClient {
     @Override
     public void setLocalCommunicationPartnerIndex(int index) {
         this.localCommunicationPartnerIndex = index;
+    }
+
+    @Override
+    public boolean hasServerSocket() {
+        return this.hasServerSocket;
+    }
+
+    @Override
+    public void setHasServerSocket() {
+        this.hasServerSocket = true;
     }
 }

@@ -25,7 +25,9 @@ public class ConnectionTest {
         MessageHandler messageHandler = new MessageHandler() {
             @Override
             public void onReceivedMessage(OtherClient client, String content) {
-                System.out.println(content);
+
+                System.out.println("Received message " + content + " - from " + client.getUserName());
+
             }
 
             @Override
@@ -42,6 +44,11 @@ public class ConnectionTest {
             public void onFailedToEstablishedACommunication(OtherClient client) {
 
             }
+
+            @Override
+            public void onRegisteredAtServer(boolean connectionSuccessful) {
+
+            }
         };
         p2PClient.setMessageHandler(messageHandler);
         p2PClient2.setMessageHandler(messageHandler);
@@ -54,5 +61,45 @@ public class ConnectionTest {
         Thread.sleep(1000);
         p2PClient2.sendMessage(0,"Hello");
         Thread.sleep(1000);
+        p2PClient.sendMessage(0, "back");
+    }
+
+    @Test
+    public void testShutdown() throws IOException, InterruptedException {
+        OtherClient otherClient = new OtherClientImpl("Patrick", 10000, InetAddress.getByName("localhost"));
+        p2PClient.connectTo(otherClient);
+        Thread.sleep(1000);
+        p2PClient2.sendMessage(0,"Hello");
+        Thread.sleep(1000);
+        p2PClient.sendMessage(0, "back");
+        Thread.sleep(1000);
+        p2PClient2.shutdown();
+        p2PClient.shutdown();
+    }
+
+    @Test
+    public void testConnectionLost() throws IOException, InterruptedException {
+        OtherClient otherClient = new OtherClientImpl("Patrick", 10000, InetAddress.getByName("localhost"));
+        p2PClient.connectTo(otherClient);
+        Thread.sleep(1000);
+        p2PClient2.sendMessage(0,"Hello");
+        Thread.sleep(1000);
+        p2PClient.sendMessage(0, "back");
+        Thread.sleep(1000);
+        p2PClient2.shutdown();
+        Thread.sleep(3000);
+        //p2PClient.sendMessage(0, "test");
+
+        p2PClient.connectTo(otherClient);
+    }
+
+    @Test
+    public void testCommunicationEstablishFailed() throws IOException, InterruptedException {
+        OtherClient otherClient = new OtherClientImpl("Patrick", 10000, InetAddress.getByName("localhost"));
+        p2PClient2.shutdown();
+        Thread.sleep(1000);
+        p2PClient.connectTo(otherClient);
+
+        p2PClient2.startUDP();
     }
 }

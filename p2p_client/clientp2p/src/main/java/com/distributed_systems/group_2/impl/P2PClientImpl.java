@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,15 +27,16 @@ public class P2PClientImpl implements P2PClient {
     private int lastPartnerID;
     private final Object connectionEstablishedToken;
     private DatagramSocket socket;
-    private int portStart = 4444;
     private String userName;
     private CommunicationEstablisher establisher;
+    private ServerSocket serverSocket;
     private ArrayList<ClientConnectionServer> clientConnectionServerInstances;
+    private int tcpPort;
 
     public P2PClientImpl(int udpPort, int tcpPortStart, String userName) {
         connectionPartners = new HashMap<>();
+        this.tcpPort = tcpPortStart;
         this.udpPort = udpPort;
-        this.portStart = tcpPortStart;
         this.userName = userName;
         lastPartnerID = 0;
         connectionEstablishedToken = new Object();
@@ -43,7 +45,7 @@ public class P2PClientImpl implements P2PClient {
 
     @Override
     public void startUDP() throws IOException {
-
+        serverSocket = new ServerSocket(tcpPort);
         socket = new DatagramSocket(udpPort);
         establisher = new CommunicationEstablisher(this);
         establisher.start();
@@ -114,16 +116,15 @@ public class P2PClientImpl implements P2PClient {
     public void connectTo(OtherClient otherClient) throws IOException {
         JSONObject message = new JSONObject();
         message.put(USER_NAME, userName);
-        message.put(TCP_PORT, portStart);
+        message.put(TCP_PORT, tcpPort);
         String msg = message.toString();
         byte[]buf = msg.getBytes();
         System.out.println("connectTo called: " + userName + " waiting as ServerSocket for " + otherClient.getUserName());
         DatagramPacket packet = new DatagramPacket(buf, buf.length, otherClient.getRemoteAddress(), otherClient.getSocketPort());
-        ClientConnectionServer clientConnectionServer = new ClientConnectionServerImpl(otherClient, this,portStart);
+        ClientConnectionServer clientConnectionServer = new ClientConnectionServerImpl(otherClient, this,serverSocket);
         clientConnectionServerInstances.add(clientConnectionServer);
         clientConnectionServer.startConnection();
         socket.send(packet);
-        portStart++;
     }
 
     @Override
@@ -157,6 +158,7 @@ public class P2PClientImpl implements P2PClient {
         Thread.sleep(1000);
 
         socket.close();
+        serverSocket.close();
     }
 
     @Override

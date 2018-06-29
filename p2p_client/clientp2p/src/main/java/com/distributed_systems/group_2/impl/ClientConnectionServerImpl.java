@@ -17,17 +17,17 @@ public class ClientConnectionServerImpl extends Thread implements ClientConnecti
     private OtherClient otherClient;
     private P2PClient localClient;
 
-    private int port;
+
     private ServerSocket serverSocket;
     private Socket clientSocket;
     private boolean isRunning;
     private PrintWriter out;
     private BufferedReader in;
 
-    public ClientConnectionServerImpl(OtherClient otherClient, P2PClient localClient, int port) {
+    public ClientConnectionServerImpl(OtherClient otherClient, P2PClient localClient, ServerSocket serverSocket) {
         this.otherClient = otherClient;
         this.localClient = localClient;
-        this.port = port;
+        this.serverSocket = serverSocket;
     }
 
     @Override
@@ -37,14 +37,15 @@ public class ClientConnectionServerImpl extends Thread implements ClientConnecti
 
     @Override
     public void closeConnection() throws IOException {
-        serverSocket.close();
-        clientSocket.close();
+        if (clientSocket != null)
+        {
+            clientSocket.close();
+        }
         isRunning = false;
     }
 
     @Override
     public void startConnection() throws IOException {
-        serverSocket = new ServerSocket(port,1);
         start();
     }
 

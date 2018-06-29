@@ -5,6 +5,7 @@ import com.distributed_systems.group_2.impl.P2PClientImpl;
 import com.distributed_systems.group_2.interfaces.MessageHandler;
 import com.distributed_systems.group_2.interfaces.OtherClient;
 import com.distributed_systems.group_2.interfaces.P2PClient;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,6 +53,12 @@ public class ConnectionTest {
         };
         p2PClient.setMessageHandler(messageHandler);
         p2PClient2.setMessageHandler(messageHandler);
+    }
+
+    @After
+    public void after() throws IOException, InterruptedException {
+        p2PClient2.shutdown();
+        p2PClient.shutdown();
     }
 
     @Test

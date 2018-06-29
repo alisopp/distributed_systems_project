@@ -39,6 +39,7 @@ public class ClientConnectionServerImpl extends Thread implements ClientConnecti
     public void closeConnection() throws IOException {
         serverSocket.close();
         clientSocket.close();
+        isRunning = false;
     }
 
     @Override
@@ -71,11 +72,19 @@ public class ClientConnectionServerImpl extends Thread implements ClientConnecti
             {
                 while ((input = in.readLine()) != null )
                 {
+                    System.out.println("ClientConnectionSERVERImpl - " + input);
                     localClient.onReceivedMessage(otherClient,input);
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            if (isRunning) {    // if still running and exception happened (no controlled shutdown)
+                try {
+                    System.out.println("ClientConnectionServerImpl Exception!");
+                    localClient.onCommunicationLost(otherClient);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
         }
     }
 }

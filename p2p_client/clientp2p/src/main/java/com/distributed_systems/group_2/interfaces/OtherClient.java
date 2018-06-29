@@ -9,4 +9,6 @@ public interface OtherClient {
     public String getUserName();
     public int localCommunicationPartnerIndex();
     public void setLocalCommunicationPartnerIndex(int index);
+    public boolean hasServerSocket();
+    public void setHasServerSocket();
 }

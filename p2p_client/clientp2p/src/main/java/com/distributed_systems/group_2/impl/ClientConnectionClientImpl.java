@@ -70,12 +70,19 @@ public class ClientConnectionClientImpl extends Thread implements ClientConnecti
                 String input;
                 while ((input = in.readLine()) != null )
                 {
+                    System.out.println("ClientConnectionClientImpl - " + input);
                     p2pClient.onReceivedMessage(otherClient,input);
                 }
             }
-        }catch (IOException ignore)
-        {
-
+        }catch (IOException e) {
+            if (isRunning) { // still running and exception happened!
+                try {
+                    System.out.println("ClientConnectionClientImpl Exception!");
+                    p2pClient.onCommunicationLost(otherClient);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
         }
 
     }

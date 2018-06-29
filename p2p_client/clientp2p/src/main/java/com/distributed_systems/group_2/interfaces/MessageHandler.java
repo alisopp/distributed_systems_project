@@ -25,4 +25,11 @@ public interface MessageHandler {
      * @param client the client to which a communication was not established
      */
     void onFailedToEstablishedACommunication(OtherClient client);
+
+
+    /**
+     *
+     * @param connectionSuccessful
+     */
+    void onRegisteredAtServer(boolean connectionSuccessful);
 }

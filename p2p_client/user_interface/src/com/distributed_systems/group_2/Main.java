@@ -3,10 +3,13 @@ package com.distributed_systems.group_2;
 import com.distributed_systems.group_2.impl.P2PClientImpl;
 import com.distributed_systems.group_2.interfaces.P2PClient;
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class Main extends Application {

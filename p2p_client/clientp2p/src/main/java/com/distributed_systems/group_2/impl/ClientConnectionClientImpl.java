@@ -50,9 +50,10 @@ public class ClientConnectionClientImpl extends Thread implements ClientConnecti
         isRunning = true;
 
         out = new PrintWriter(clientSocket.getOutputStream(), true);
-
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
         start();
+
         p2pClient.connectionEstablished(this);
     }
 
@@ -65,14 +66,17 @@ public class ClientConnectionClientImpl extends Thread implements ClientConnecti
     public void run() {
         try
         {
-            while (isRunning)
+            while (isRunning && clientSocket.isConnected() && !clientSocket.isClosed())
             {
                 String input;
                 while ((input = in.readLine()) != null )
                 {
-                    System.out.println("ClientConnectionClientImpl - " + input);
                     p2pClient.onReceivedMessage(otherClient,input);
                 }
+            }
+
+            if (!clientSocket.isClosed() && !clientSocket.isConnected()) {   // socket not closed & not connected --> connection error
+                p2pClient.onCommunicationLost(otherClient);
             }
         }catch (IOException e) {
             if (isRunning) { // still running and exception happened!

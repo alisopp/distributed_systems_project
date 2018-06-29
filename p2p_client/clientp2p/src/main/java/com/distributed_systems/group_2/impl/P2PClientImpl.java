@@ -43,10 +43,11 @@ public class P2PClientImpl implements P2PClient {
 
     @Override
     public void startUDP() throws IOException {
-
+        System.out.println(userName + " - starting UDP...");
         socket = new DatagramSocket(udpPort);
         establisher = new CommunicationEstablisher(this);
         establisher.start();
+        System.out.println(userName + " - UDP running!");
     }
 
     @Override
@@ -63,7 +64,6 @@ public class P2PClientImpl implements P2PClient {
 
     @Override
     public void onCommunicationLost (OtherClient otherClient) throws IOException {
-        //TODO lost communication with chat partner
         messageHandler.onLostCommunication(otherClient);
 
         System.out.println("Connection to " + otherClient.getUserName() + " lost!");
@@ -77,7 +77,6 @@ public class P2PClientImpl implements P2PClient {
 
     @Override
     public void onCommunicationEstablishedFailed(OtherClient otherClient) throws IOException {
-        //TODO failed to connect to chatPartner
         messageHandler.onFailedToEstablishedACommunication(otherClient);
 
         System.out.println("Failed to establish connection to " + otherClient.getUserName());
@@ -97,7 +96,8 @@ public class P2PClientImpl implements P2PClient {
 
     @Override
     public void sendMessage(int localCommunicationPartnerIndex, String message) {
-        connectionPartners.get(localCommunicationPartnerIndex).sendMessage(message);
+        if (connectionPartners.get(localCommunicationPartnerIndex) != null)
+            connectionPartners.get(localCommunicationPartnerIndex).sendMessage(message);
     }
 
     @Override
@@ -117,7 +117,6 @@ public class P2PClientImpl implements P2PClient {
         message.put(TCP_PORT, portStart);
         String msg = message.toString();
         byte[]buf = msg.getBytes();
-        System.out.println("connectTo called: " + userName + " waiting as ServerSocket for " + otherClient.getUserName());
         DatagramPacket packet = new DatagramPacket(buf, buf.length, otherClient.getRemoteAddress(), otherClient.getSocketPort());
         ClientConnectionServer clientConnectionServer = new ClientConnectionServerImpl(otherClient, this,portStart);
         clientConnectionServerInstances.add(clientConnectionServer);
@@ -135,15 +134,16 @@ public class P2PClientImpl implements P2PClient {
     public void shutdown() throws IOException, InterruptedException {
         System.out.println(userName + " got shutdown request!");
 
-        establisher.stopCommunicationEstablisher();
-        ArrayList<ClientConnectionClient> clientConnectionClientInstances = establisher.getClientConnectionClientInstances();
-
-        System.out.println("Closing " + clientConnectionClientInstances.size() + " client connections...");
-        // close client sockets
-        for (ClientConnectionClient clientConnectionClient : clientConnectionClientInstances) {
-            clientConnectionClient.closeConnection();
+        if (establisher != null) {
+            establisher.stopCommunicationEstablisher();
+            ArrayList<ClientConnectionClient> clientConnectionClientInstances = establisher.getClientConnectionClientInstances();
+            System.out.println("Closing " + clientConnectionClientInstances.size() + " client connections...");
+            // close client sockets
+            for (ClientConnectionClient clientConnectionClient : clientConnectionClientInstances) {
+                clientConnectionClient.closeConnection();
+            }
+            System.out.println("Done.");
         }
-        System.out.println("Done.");
 
         Thread.sleep(1000);
 
@@ -156,7 +156,9 @@ public class P2PClientImpl implements P2PClient {
 
         Thread.sleep(1000);
 
+        System.out.println("Closing socket...");
         socket.close();
+        System.out.println("Shutdown finished!");
     }
 
     @Override
@@ -172,7 +174,6 @@ public class P2PClientImpl implements P2PClient {
         private ArrayList<ClientConnectionClient> clientConnectionClientInstances;
 
         public CommunicationEstablisher(P2PClient client) {
-
             p2pClient = client;
             clientConnectionClientInstances = new ArrayList<>();
         }
@@ -195,7 +196,6 @@ public class P2PClientImpl implements P2PClient {
         public void run() {
             OtherClient temp = null;
             try {
-
                 while (isRunning)
                 {
                     byte[] buf = new byte[256];

@@ -15,13 +15,17 @@ public class ConnectionTest {
 
     P2PClient p2PClient;
     P2PClient p2PClient2;
+    private static int index = 0;
 
     @Before
-    public void init() throws IOException {
-        p2PClient = new P2PClientImpl(20000,17000, "Alex");
-        p2PClient2 = new P2PClientImpl(10000, 27000, "Patrick");
+    public void init() throws IOException, InterruptedException {
+        index+=10;
+        p2PClient = new P2PClientImpl(20000+index,17000+index, "Alex");
+        p2PClient2 = new P2PClientImpl(10000+index, 27000+index, "Patrick");
+
         p2PClient.startUDP();
         p2PClient2.startUDP();
+
         MessageHandler messageHandler = new MessageHandler() {
             @Override
             public void onReceivedMessage(OtherClient client, String content) {
@@ -32,7 +36,7 @@ public class ConnectionTest {
 
             @Override
             public void onLostCommunication(OtherClient client) {
-
+                System.out.println("Communication to " + client.getUserName() + " lost!");
             }
 
             @Override
@@ -56,7 +60,7 @@ public class ConnectionTest {
 
     @Test
     public void testConnection() throws IOException, InterruptedException {
-        OtherClient otherClient = new OtherClientImpl("Patrick", 10000, InetAddress.getByName("localhost"));
+        OtherClient otherClient = new OtherClientImpl("Patrick", 10000+index, InetAddress.getByName("localhost"));
         p2PClient.connectTo(otherClient);
         Thread.sleep(1000);
         p2PClient2.sendMessage(0,"Hello");
@@ -66,7 +70,7 @@ public class ConnectionTest {
 
     @Test
     public void testShutdown() throws IOException, InterruptedException {
-        OtherClient otherClient = new OtherClientImpl("Patrick", 10000, InetAddress.getByName("localhost"));
+        OtherClient otherClient = new OtherClientImpl("Patrick", 10000+index, InetAddress.getByName("localhost"));
         p2PClient.connectTo(otherClient);
         Thread.sleep(1000);
         p2PClient2.sendMessage(0,"Hello");
@@ -79,7 +83,7 @@ public class ConnectionTest {
 
     @Test
     public void testConnectionLost() throws IOException, InterruptedException {
-        OtherClient otherClient = new OtherClientImpl("Patrick", 10000, InetAddress.getByName("localhost"));
+        OtherClient otherClient = new OtherClientImpl("Patrick", 10000+index, InetAddress.getByName("localhost"));
         p2PClient.connectTo(otherClient);
         Thread.sleep(1000);
         p2PClient2.sendMessage(0,"Hello");
@@ -88,18 +92,35 @@ public class ConnectionTest {
         Thread.sleep(1000);
         p2PClient2.shutdown();
         Thread.sleep(3000);
-        //p2PClient.sendMessage(0, "test");
-
         p2PClient.connectTo(otherClient);
     }
 
     @Test
     public void testCommunicationEstablishFailed() throws IOException, InterruptedException {
-        OtherClient otherClient = new OtherClientImpl("Patrick", 10000, InetAddress.getByName("localhost"));
+        OtherClient otherClient = new OtherClientImpl("Patrick", 10000+index, InetAddress.getByName("localhost"));
         p2PClient2.shutdown();
         Thread.sleep(1000);
         p2PClient.connectTo(otherClient);
+        Thread.sleep(7000);
+        p2PClient.sendMessage(0,"Hello");
+        p2PClient.shutdown();
+        Thread.sleep(3000);
+    }
 
-        p2PClient2.startUDP();
+    @Test
+    public void testCommunicationEstablishFailedReconnectSuccessful() throws IOException, InterruptedException {
+        OtherClient otherClient = new OtherClientImpl("Patrick", 10000+index, InetAddress.getByName("localhost"));
+        p2PClient2.shutdown();  // shutdown other client...
+        Thread.sleep(1000);
+        p2PClient.connectTo(otherClient);   // ... so connect fails and triggers retries
+        Thread.sleep(7000);
+        p2PClient2.startUDP();  // after some time UDP is up and running again, retry should succeed now!
+        Thread.sleep(3000);
+        p2PClient.sendMessage(0,"Hello");
+        Thread.sleep(1000);
+        p2PClient2.sendMessage(0, "back");
+        p2PClient2.shutdown();
+        p2PClient.shutdown();
+        Thread.sleep(3000);
     }
 }

@@ -64,6 +64,17 @@ public class Controller implements MessageHandler {
         client.startCommunication(connect.getText());
         setPane(chat);
     }
+    @FXML
+    public void backToClient() throws Exception{
+        setPane(connectToClient);
+    }
+    @FXML
+    public void backToServerSelect() throws Exception{
+        client.shutdown();
+        setPane(main);
+    }
+
+
 
 
     @Override

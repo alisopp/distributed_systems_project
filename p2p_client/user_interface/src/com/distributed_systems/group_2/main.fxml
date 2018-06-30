@@ -36,6 +36,7 @@
                 <children>
                     <ListView fx:id="chatHistory" prefHeight="2000.0" prefWidth="2000.0" />
                     <TextArea fx:id="chatText" onKeyReleased="#keyDownChat" prefHeight="2000.0" prefWidth="2000.0" GridPane.rowIndex="1" />
+                  <Button mnemonicParsing="false" onAction="#backToClient" text="Back" GridPane.rowIndex="2" />
                 </children>
                <columnConstraints>
                   <ColumnConstraints />
@@ -43,17 +44,20 @@
                <rowConstraints>
                   <RowConstraints maxHeight="67.0" minHeight="8.0" prefHeight="56.0" />
                   <RowConstraints maxHeight="107.0" minHeight="48.0" prefHeight="59.0" />
+                  <RowConstraints />
                </rowConstraints>
             </GridPane>
             <GridPane fx:id="connectToClient" disable="true" visible="false">
                 <children>
-                    <Button fx:id="refresh" mnemonicParsing="false" onAction="#refreshClients" text="Refresh" GridPane.rowIndex="1" />
-                    <TextField fx:id="connect" />
+                    <Button fx:id="refresh" mnemonicParsing="false" onAction="#refreshClients" text="Chat" GridPane.rowIndex="1" />
+                    <TextField fx:id="connect" promptText="User" />
+                  <Button mnemonicParsing="false" onAction="#backToServerSelect" text="Log Off" GridPane.rowIndex="2" />
                 </children>
                <columnConstraints>
                   <ColumnConstraints />
                </columnConstraints>
                <rowConstraints>
+                  <RowConstraints />
                   <RowConstraints />
                   <RowConstraints />
                </rowConstraints>

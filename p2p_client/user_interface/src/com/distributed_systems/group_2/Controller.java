@@ -55,7 +55,7 @@ public class Controller implements MessageHandler {
     @FXML
     public void keyDownChat(KeyEvent event) throws Exception{
         if (event.getCode().equals(KeyCode.ENTER)){
-            chatHistory.getItems().add(new ChatPost(chatText.getText()));
+            chatHistory.getItems().add(new ChatPost(chatText.getText().trim()));
             chatText.setText("");
         }
     }

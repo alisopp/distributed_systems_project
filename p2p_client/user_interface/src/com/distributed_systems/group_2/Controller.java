@@ -49,13 +49,13 @@ public class Controller implements MessageHandler {
         client = new P2PClientImpl(7777,40000, "Hellmuth");
         client.setMessageHandler(this);
         client.register(masterIp+":"+masterPort);
-        //TODO check if connection established
 
     }
     @FXML
     public void keyDownChat(KeyEvent event) throws Exception{
         if (event.getCode().equals(KeyCode.ENTER)){
             chatHistory.getItems().add(new ChatPost(chatText.getText().trim()));
+            client.sendMessage(0,chatText.getText());
             chatText.setText("");
         }
     }
@@ -68,6 +68,9 @@ public class Controller implements MessageHandler {
 
     @Override
     public void onReceivedMessage(OtherClient client, String content) {
+        if (chatHistory!=null){
+            chatHistory.getItems().add(new ChatPost(content));
+        }
 
     }
 

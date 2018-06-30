@@ -4,8 +4,10 @@ import com.distributed_systems.group_2.impl.P2PClientImpl;
 import com.distributed_systems.group_2.interfaces.MessageHandler;
 import com.distributed_systems.group_2.interfaces.OtherClient;
 import com.distributed_systems.group_2.interfaces.P2PClient;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableView;
@@ -13,13 +15,16 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
 
 
 public class Controller implements MessageHandler {
 
-    private static P2PClient client;
+    private P2PClient client;
 
     @FXML private TextField ip;
     @FXML private TextField port;
@@ -27,6 +32,13 @@ public class Controller implements MessageHandler {
     @FXML private TableView<User> clientTable;
     @FXML private ListView chatHistory;
     @FXML private TextField connect;
+    @FXML private StackPane holder;
+    @FXML private GridPane chat;
+    @FXML private GridPane connectToClient;
+    @FXML private GridPane main;
+
+    private Pane currentPane;
+
 
 
     @FXML
@@ -43,15 +55,14 @@ public class Controller implements MessageHandler {
     @FXML
     public void keyDownChat(KeyEvent event) throws Exception{
         if (event.getCode().equals(KeyCode.ENTER)){
-            chatHistory.getItems().add(new ChatPost(chatText.getText()));
+            chatHistory.getItems().add(new ChatPost(chatText.getText().trim()));
             chatText.setText("");
         }
     }
     @FXML
     public void refreshClients() throws Exception{
         client.startCommunication(connect.getText());
-        Parent root = FXMLLoader.load(getClass().getResource("chat.fxml"));
-        Main.primaryStage.getScene().setRoot(root);
+        setPane(chat);
     }
 
 
@@ -77,12 +88,22 @@ public class Controller implements MessageHandler {
 
     @Override
     public void onRegisteredAtServer(boolean connectionSuccessful) {
-        Parent root = null;
-        try {
-            root = FXMLLoader.load(getClass().getResource("connectToClient.fxml"));
-        } catch (IOException e) {
-            e.printStackTrace();
+        setPane(connectToClient);
+    }
+
+
+    public void setPane(Pane pane)
+    {
+        if(currentPane != null)
+        {
+            currentPane.setDisable(true);
+            currentPane.setVisible(false);
+        }else {
+            main.setDisable(true);
+            main.setVisible(false);
         }
-        Main.primaryStage.getScene().setRoot(root);
+        currentPane = pane;
+        currentPane.setDisable(false);
+        currentPane.setVisible(true);
     }
 }

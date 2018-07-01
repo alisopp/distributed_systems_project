@@ -1,6 +1,10 @@
 package com.distributed_systems.group_2.interfaces;
 
 public interface MessageHandler {
+    int STATUS_SUCCESS = 0;
+    int STATUS_COULD_NOT_REACH_SERVER = 1;
+    int STATUS_NAME_IN_USE = 2;
+
     /**
      *
      * @param client person who sends the message
@@ -29,7 +33,7 @@ public interface MessageHandler {
 
     /**
      *
-     * @param connectionSuccessful
+     * @param statusCode {@link #STATUS_SUCCESS}, {@link #STATUS_COULD_NOT_REACH_SERVER}, {@link #STATUS_NAME_IN_USE}
      */
-    void onRegisteredAtServer(boolean connectionSuccessful);
+    void onRegisteredAtServer(int statusCode);
 }

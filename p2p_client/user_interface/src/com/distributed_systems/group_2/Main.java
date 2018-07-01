@@ -18,7 +18,7 @@ public class Main extends Application {
         this.primaryStage=primaryStage;
         Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
         primaryStage.setTitle("Peer to Peer Chat");
-        primaryStage.setScene(new Scene(root, 300, 275));
+        primaryStage.setScene(new Scene(root, 1280, 720));
         primaryStage.show();
     }
 

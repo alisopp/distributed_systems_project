@@ -91,7 +91,6 @@ public class Controller implements MessageHandler {
             client.setUserName(username.getText());
         }
 
-
         client.register(masterIp+":"+masterPort);
         userName = username.getText();
     }

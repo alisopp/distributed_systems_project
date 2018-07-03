@@ -25,4 +25,6 @@ public interface P2PClient {
     void setMessageHandler(MessageHandler messageHandler);
     void shutdown() throws IOException, InterruptedException;
     Map<Integer,ClientConnection> getCommunicationPartners();
+
+    void setUserName(String newName);
 }

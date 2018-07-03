@@ -53,18 +53,22 @@ public class P2PClientImpl implements P2PClient {
 
     @Override
     public void register(String hostURL) throws IOException {
+
         connectionToSuperServer = new ServerConnectorImpl(hostURL, userName, messageHandler);
-        connectionToSuperServer.initServerConnection(444);
-        startUDP();
+
+        connectionToSuperServer.initServerConnection(udpPort);
+        if (serverSocket == null) {
+            startUDP();
+        }
     }
 
     @Override
-    public void onReceivedMessage(OtherClient sender,String message) {
-        messageHandler.onReceivedMessage(sender,message);
+    public void onReceivedMessage(OtherClient sender, String message) {
+        messageHandler.onReceivedMessage(sender, message);
     }
 
     @Override
-    public void onCommunicationLost (OtherClient otherClient) throws IOException {
+    public void onCommunicationLost(OtherClient otherClient) throws IOException {
         //TODO lost communication with chat partner
         messageHandler.onLostCommunication(otherClient);
 
@@ -94,7 +98,12 @@ public class P2PClientImpl implements P2PClient {
     @Override
     public void startCommunication(String clientName) throws IOException {
         OtherClient otherClient = connectionToSuperServer.getOtherClientFromServer(clientName);
-        connectTo(otherClient);
+        if (otherClient == null) {
+            messageHandler.onFailedToEstablishedACommunication(new FailedOtherClientImpl(clientName));
+        } else {
+            connectTo(otherClient);
+        }
+
     }
 
     @Override
@@ -104,7 +113,7 @@ public class P2PClientImpl implements P2PClient {
 
     @Override
     public void connectionEstablished(ClientConnection clientConnection) {
-        synchronized (connectionEstablishedToken){
+        synchronized (connectionEstablishedToken) {
             connectionPartners.put(lastPartnerID, clientConnection);
             clientConnection.getOtherClient().setLocalCommunicationPartnerIndex(lastPartnerID);
             lastPartnerID++;
@@ -118,10 +127,10 @@ public class P2PClientImpl implements P2PClient {
         message.put(USER_NAME, userName);
         message.put(TCP_PORT, tcpPort);
         String msg = message.toString();
-        byte[]buf = msg.getBytes();
+        byte[] buf = msg.getBytes();
         System.out.println("connectTo called: " + userName + " waiting as ServerSocket for " + otherClient.getUserName());
         DatagramPacket packet = new DatagramPacket(buf, buf.length, otherClient.getRemoteAddress(), otherClient.getSocketPort());
-        ClientConnectionServer clientConnectionServer = new ClientConnectionServerImpl(otherClient, this,serverSocket);
+        ClientConnectionServer clientConnectionServer = new ClientConnectionServerImpl(otherClient, this, serverSocket);
         clientConnectionServerInstances.add(clientConnectionServer);
         clientConnectionServer.startConnection();
         socket.send(packet);
@@ -159,6 +168,9 @@ public class P2PClientImpl implements P2PClient {
 
         socket.close();
         serverSocket.close();
+        if (connectionToSuperServer != null) {
+            connectionToSuperServer.sendLeaveMessage();
+        }
     }
 
     @Override
@@ -166,9 +178,13 @@ public class P2PClientImpl implements P2PClient {
         return connectionPartners;
     }
 
+    @Override
+    public void setUserName(String newName) {
+        this.userName = newName;
+    }
 
-    private class CommunicationEstablisher extends Thread
-    {
+
+    private class CommunicationEstablisher extends Thread {
         private boolean isRunning;
         private P2PClient p2pClient;
         private ArrayList<ClientConnectionClient> clientConnectionClientInstances;
@@ -189,7 +205,7 @@ public class P2PClientImpl implements P2PClient {
 
         @Override
         public synchronized void start() {
-            isRunning= true;
+            isRunning = true;
             super.start();
         }
 
@@ -198,15 +214,13 @@ public class P2PClientImpl implements P2PClient {
             OtherClient temp = null;
             try {
 
-                while (isRunning)
-                {
+                while (isRunning) {
                     byte[] buf = new byte[256];
                     DatagramPacket packet = new DatagramPacket(buf, buf.length);
                     socket.receive(packet);
-                    String message = new String(packet.getData(),0, packet.getLength());
+                    String message = new String(packet.getData(), 0, packet.getLength());
                     JSONObject object = new JSONObject(message);
-                    if (!object.has(USER_NAME) || !object.has(TCP_PORT))
-                    {
+                    if (!object.has(USER_NAME) || !object.has(TCP_PORT)) {
                         System.err.println("Received an unknown message");
                         continue;
                     }

@@ -39,12 +39,10 @@ public class Controller implements MessageHandler {
 
     // chat
     @FXML private Label usernameLabel;
-    @FXML private TextArea chatText;
     @FXML private TextArea chatHistoryTable;
     @FXML private TextField chatInput;
     @FXML private ListView communicationPartners;
     @FXML private GridPane connectToClient;
-    @FXML private ListView chatHistory;
     @FXML private TextField connect;
     @FXML private StackPane holder;
     @FXML private GridPane chat;
@@ -94,22 +92,12 @@ public class Controller implements MessageHandler {
         client.register(masterIp+":"+masterPort);
         userName = username.getText();
     }
-    @FXML
-    public void keyDownChat(KeyEvent event) throws Exception{
-        if (event.getCode().equals(KeyCode.ENTER)){
-            chatHistory.getItems().add(new ChatPost(chatText.getText().trim()));
-            client.sendMessage(currentChatPartner,chatText.getText());
-            chatText.setText("");
-        }
-    }
+
     @FXML
     public void refreshClients() throws Exception{
         client.startCommunication(connect.getText());
     }
-    @FXML
-    public void backToClient() throws Exception{
-        setPane(connectToClient);
-    }
+
     @FXML
     public void backToServerSelect() throws Exception{
         client.shutdown();

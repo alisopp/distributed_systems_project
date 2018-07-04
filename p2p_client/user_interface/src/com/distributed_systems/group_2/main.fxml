@@ -43,21 +43,6 @@
                   <RowConstraints />
                </rowConstraints>
             </GridPane>
-            <GridPane fx:id="chat" disable="true" visible="false">
-               <children>
-                  <ListView fx:id="chatHistory" GridPane.rowIndex="0" />
-                  <TextArea fx:id="chatText" onKeyReleased="#keyDownChat" GridPane.rowIndex="1" />
-                  <Button mnemonicParsing="false" onAction="#backToClient" text="Back" GridPane.rowIndex="2" />
-               </children>
-               <columnConstraints>
-                  <ColumnConstraints  percentWidth="100.0"/>
-               </columnConstraints>
-               <rowConstraints>
-                  <RowConstraints percentHeight="60.0"/>
-                  <RowConstraints percentHeight="30.0"/>
-                  <RowConstraints percentHeight="10.0"/>
-               </rowConstraints>
-            </GridPane>
             <GridPane fx:id="connectToClient" disable="true" visible="false" alignment="CENTER">
                 <children>
                     <HBox alignment="CENTER" GridPane.columnSpan="2">
